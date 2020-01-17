@@ -6,7 +6,7 @@
 #
 # Licence CC BY-NC-SA
 # Arthur Detaille - january 2020
-# Based on Uriot 'DIMENSION' Anglel's work
+# Based on Uriot 'DIMENSION' Angel's work
 
 # ###############################
 # IMPORT
@@ -57,7 +57,7 @@ class Star:
         px = self.x * scale
         py = self.y * scale
 
-        ellipseScale = 20
+        ellipseScale = 50
 
         shape = [
             (
