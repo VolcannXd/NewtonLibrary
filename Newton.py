@@ -20,6 +20,7 @@ import random                           # Random
 import PIL                              # PILLOW: Python Imaginary Library
 from PIL import Image                   # PILLOW: Python Imaginary Library's Image module
 from PIL import ImageDraw               # PILLOW: Python Imaginary Library's ImageDraw module
+from PIL import ImageFont
 
 # Image Saving Managment
 from datetime import date, datetime     # DateTime: date & dateTime
@@ -37,20 +38,30 @@ class Star:
         self.MaxMass = MaxMass
         self.mass = random.randint(minMass, MaxMass)
 
+        self.speed = 0
+
+        self.color = (
+            255,
+            random.randint(0, 255),
+            random.randint(0, 10)
+        )
+
     def move(self, space) :
         for star in space.stars :
+            # prevent calculation of force beetween itself and by doing that, prevent Runtime Error : Division by zero
             if star != self :
                 distance = math.sqrt((star.x - self.x) * (star.x - self.x) + (star.y - self.y) * (star.y - self.y))
-                
+
                 force = space.gravity * ((star.mass * self.mass) / (distance * distance))
+                acceleration = force / self.mass
 
                 direction = Vec2(
                     star.x - self.x,
                     star.y - self.y
                 )
 
-                self.x += direction.x * force
-                self.y += direction.y * force
+                self.x += direction.x * acceleration
+                self.y += direction.y * acceleration
 
     def draw(self, g, scale) :
         # Draw a white point on g at (self.x * scale, self.y * scale)
@@ -59,6 +70,7 @@ class Star:
 
         ellipseScale = 50
 
+        # define shape
         shape = [
             (
                 px - math.ceil(self.mass / ellipseScale),
@@ -70,7 +82,7 @@ class Star:
             )
         ]
 
-        g.ellipse(shape, fill="white")
+        g.ellipse(shape, fill=self.color)
 
 # ###############################
 # VECTOR 2D OBJECT
@@ -94,6 +106,7 @@ class Space:
         self.size = size
         self.gravity = gravity
         self.stars = []
+        self.deltaTime = 0
 
     def populate(self, n) :
         for i in range(0, n) :
@@ -114,7 +127,6 @@ class Space:
     def update(self) :
         for star in self.stars :
             star.move(self)
-            pass
 
 # ###############################
 # RENDERER OBJECT
@@ -130,18 +142,23 @@ class Renderer:
         self.frames[0].save(self.filename + '.gif', format='GIF', append_images=self.frames[1:], save_all=True, duration=50, loop=0)
 
     def computeCache(self, space) :
+        self.frame += 1
         # Setting up image for rendering
         img = Image.new(
             mode = "RGB",
             size = (space.size.x * self.scale, space.size.y * self.scale)
         )
 
+        # Draw module reference
+        g = PIL.ImageDraw.Draw(img)
+
         for i in range(0, len(space.stars)) :
-            g = PIL.ImageDraw.Draw(img)
             space.stars[i].draw(g, self.scale)
 
+        g.text((10, 10), self.filename + " | frame #" + str(self.frame), font=ImageFont.truetype("arial"))
+        g.text((10, 25), "Rendered thanks to 'Newton Open Library' - Pre Release", font=ImageFont.truetype("arial"))
+
         self.frames.append(img)
-        self.frame += 1
 
         logInfos = "'" + self.filename + "' cached."
         return logInfos
@@ -156,24 +173,29 @@ class Simulation:
         self.space = space
         self.renderer = renderer
 
+        space.deltaTime = self.deltaTime
+
     def simulate(self) :
         start_time = time.time()
         print("LOG: Start simulation caching...")
+        print("#######################################")
         for f in range(0, self.frames) :
             for dt in range(0, self.deltaTime) :
                 self.space.update()
 
             self.renderer.computeCache(self.space)
 
-            frameCount = "[" + str(f) + "/" + str(self.frames) + "]"
-            print("LOG: simulation cycle completed. " + frameCount)
-        
+            frameCount = "[" + str(f + 1) + "/" + str(self.frames) + "]"
+            print("LOG: Cached " + frameCount)
+
         elapsed_time = time.time() - start_time
         elapsed_time_logged = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
+        print("#######################################")
         print("LOG: Caching done. Time elapsed: " + elapsed_time_logged)
 
+        print("LOG: Start rendering")
         self.renderer.renderHasGif()
-        print("LOG: Render done.")
+        print("LOG: Render done. Saved as: '" + self.renderer.filename + ".gif'")
 
 # ###############################
 # LOADING LOG
