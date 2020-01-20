@@ -31,9 +31,8 @@ import os                               # OS: import for directory managment
 # STAR OBJECT
 # ###############################
 class Star:
-    def __init__(self, x, y, minMass, MaxMass) :
-        self.x = x
-        self.y = y
+    def __init__(self, position, minMass, MaxMass) :
+        self.position = position
         self.minMass = minMass
         self.MaxMass = MaxMass
         self.mass = random.randint(minMass, MaxMass)
@@ -49,33 +48,35 @@ class Star:
     def draw(self, g, scale) :
         # Draw a white point on g at (self.x * scale, self.y * scale)
         # scale (float) represent grid scale
-        px = self.x * scale
-        py = self.y * scale
+        px = self.position.x * scale
+        py = self.position.y * scale
+
+        shapeScale = self.minMass * 5
 
         # define shape
         shape = [
             (
-                px - math.ceil(self.mass / self.minMass),
-                py - math.ceil(self.mass / self.minMass)
+                px - math.ceil(self.mass / shapeScale),
+                py - math.ceil(self.mass / shapeScale)
             ),
             (
-                px + math.ceil(self.mass / self.minMass),
-                py + math.ceil(self.mass / self.minMass)
+                px + math.ceil(self.mass / shapeScale),
+                py + math.ceil(self.mass / shapeScale)
             )
         ]
 
         g.ellipse(shape, fill=self.color)
 
     def computeForce(self, star, space) :
-        distance = math.sqrt((star.x - self.x) * (star.x - self.x) + (star.y - self.y) * (star.y - self.y))
+        distance = math.sqrt((star.position.x - self.position.x) * (star.position.x - self.position.x) + (star.position.y - self.position.y) * (star.position.y - self.position.y))
         force = space.gravity * ((star.mass * self.mass) / (distance * distance))
 
         return force
 
     def computeDirection(self, star) :
         dir = Vec2(
-            self.x - star.x,
-            self.y - star.y
+            star.position.x - self.position.x,
+            star.position.y - self.position.y
         )
 
         return dir
@@ -95,7 +96,7 @@ class Star:
         return acc
 
     def move(self, space) :
-        self.position = self.computeAcceleration(space)
+        self.position.AddVec2d(self.computeAcceleration(space))
 
 # ###############################
 # VECTOR 2D OBJECT
@@ -118,11 +119,17 @@ class Vec2:
         self.y += vec.y
         return self
 
+    def SubVec2d(self, vec) :
+        self.x -= vec.x
+        self.y -= vec.y
+        return self
+
     def MultiplyVec2d(self, vec) :
         self.x *= vec.x
         self.y *= vec.y
         return self
 
+    # SCALAR PRODUCT OF VECTOR (self)
     def MultiplyDouble(self, double) :
         self.x *= double
         self.y *= double
@@ -144,10 +151,9 @@ class Space:
             y = random.random() * self.size.y
 
             star = Star(
-                x,
-                y,
-                1000,
-                10000
+                Vec2(x, y),     # Postion
+                1000,           # Minimal position
+                10000           # Maximal position
             )
 
             self.stars.append(star)
@@ -184,7 +190,7 @@ class Renderer:
             space.stars[i].draw(g, self.scale)
 
         g.text((10, 10), self.filename + " | frame #" + str(self.frame), font=ImageFont.truetype("arial"))
-        g.text((10, 25), "Rendered thanks to 'Newton Open Library' - Pre Release", font=ImageFont.truetype("arial"))
+        g.text((10, 25), "Newton library (open source) by Arthur Detaille", font=ImageFont.truetype("arial"))
 
         self.frames.append(img)
 

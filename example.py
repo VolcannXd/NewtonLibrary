@@ -1,25 +1,32 @@
 import Newton
 
 space = Newton.Space(
-    Newton.Vec2(800, 600),                          # univer's size -> Vec2(xSize, ySize)
-    1                                               # gravity constant
+    Newton.Vec2(500, 500),                          # univer's size -> Vec2(xSize, ySize)
+    0.0001                                          # gravity constant
 )
 
-space.populate(100)                                 # populate space with n=100 stars
+space.populate(200)                                 # populate space with n=200 stars
 
 renderer = Newton.Renderer(
-    "render_800x600_350f_10dt",                     # file name
+    "render_500x500_450f_0-0001g_5dt_200s",         # file name
     1                                               # Adjusting rendered image scale
 )
 
 sim = Newton.Simulation(
-    1,                                              # steps computed each frames
-    200,                                            # numbers of frame (at 30 fps)
+    5,                                              # steps computed each frames
+    450,                                            # numbers of frame (at 30 fps)
     space,                                          # space to compute reference
     renderer,                                       # renderer reference
 )
 
-sim.simulate()                                      # start simulation of var space
+sim.simulate()                                      # start simulation
 
 print()
 input("Press ENTER to continue...")
+
+# ################################
+# SIDE NOTE :
+# ################################
+# With those parameters my CPU (Intel I5-6600K 3.5Ghz)
+# compute this simulation in 30 to 32 seconds.
+# ################################
