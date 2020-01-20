@@ -46,43 +46,56 @@ class Star:
             random.randint(0, 10)
         )
 
-    def move(self, space) :
-        for star in space.stars :
-            # prevent calculation of force beetween itself and by doing that, prevent Runtime Error : Division by zero
-            if star != self :
-                distance = math.sqrt((star.x - self.x) * (star.x - self.x) + (star.y - self.y) * (star.y - self.y))
-
-                force = space.gravity * ((star.mass * self.mass) / (distance * distance))
-                acceleration = force / self.mass
-
-                direction = Vec2(
-                    star.x - self.x,
-                    star.y - self.y
-                )
-
-                self.x += direction.x * acceleration
-                self.y += direction.y * acceleration
-
     def draw(self, g, scale) :
         # Draw a white point on g at (self.x * scale, self.y * scale)
+        # scale (float) represent grid scale
         px = self.x * scale
         py = self.y * scale
-
-        ellipseScale = 50
 
         # define shape
         shape = [
             (
-                px - math.ceil(self.mass / ellipseScale),
-                py - math.ceil(self.mass / ellipseScale)
+                px - math.ceil(self.mass / self.minMass),
+                py - math.ceil(self.mass / self.minMass)
             ),
             (
-                px + math.ceil(self.mass / ellipseScale),
-                py + math.ceil(self.mass / ellipseScale)
+                px + math.ceil(self.mass / self.minMass),
+                py + math.ceil(self.mass / self.minMass)
             )
         ]
 
         g.ellipse(shape, fill=self.color)
+
+    def computeForce(self, star, space) :
+        distance = math.sqrt((star.x - self.x) * (star.x - self.x) + (star.y - self.y) * (star.y - self.y))
+        force = space.gravity * ((star.mass * self.mass) / (distance * distance))
+
+        return force
+
+    def computeDirection(self, star) :
+        dir = Vec2(
+            self.x - star.x,
+            self.y - star.y
+        )
+
+        return dir
+
+    def computeAcceleration(self, space) :
+        Forces = Vec2(0, 0)
+        for star in space.stars :
+            if star != self :
+                # Prevent Runtime error : Division by zero
+                force = self.computeForce(star, space)
+                Forces.AddVec2d(
+                    self.computeDirection(star).MultiplyDouble(force)
+                )
+
+        acc =  Forces.MultiplyDouble(1/self.mass)
+
+        return acc
+
+    def move(self, space) :
+        self.position = self.computeAcceleration(space)
 
 # ###############################
 # VECTOR 2D OBJECT
@@ -99,6 +112,21 @@ class Vec2:
 
     def logVector2d(self) :
         return "(" + str(self.x) + ", " + str(self.y) + ")"
+
+    def AddVec2d(self, vec) :
+        self.x += vec.x
+        self.y += vec.y
+        return self
+
+    def MultiplyVec2d(self, vec) :
+        self.x *= vec.x
+        self.y *= vec.y
+        return self
+
+    def MultiplyDouble(self, double) :
+        self.x *= double
+        self.y *= double
+        return self
 
 class Space:
     # Space Class
@@ -118,8 +146,8 @@ class Space:
             star = Star(
                 x,
                 y,
-                10,
-                100
+                1000,
+                10000
             )
 
             self.stars.append(star)
