@@ -13,3 +13,6 @@ Programmed in python 3.8.x this project was made in one evening (for the basic s
 ### Special Thanks
 - Houri M.D.
 - Mamou M.D.
+
+# Deeper Instructions
+You may find some other bugs. Please contact me or feel free to post you corrected version on your Git :)
