@@ -1,6 +1,8 @@
 # Newton Library
 ## Simulate and render gravity simulation
 
+<br>
+
 ### Basic Information
 Please, find Newton library as 'Newton.py' and an example of it's use as 'example.py' (available on this rep).<br/>
 This Library is a GNU GPL v2 protected program.<br/>
@@ -14,5 +16,5 @@ Programmed in python 3.8.x this project was made in one evening (for the basic s
 - Houri M.D.
 - Mamou M.D.
 
-# Deeper Instructions
+### Deeper Instructions
 You may find some other bugs. Please contact me or feel free to post you corrected version on your Git :)
