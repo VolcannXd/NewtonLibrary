@@ -1,21 +1,21 @@
 import Newton
 
 space = Newton.Space(
-    Newton.Vec2(750, 1000),                         # univer's size -> Vec2(xSize, ySize)
+    Newton.Vec2(1000, 750),                         # univer's size -> Vec2(xSize, ySize)
     0.0000000006674                                 # gravity constant
 )
 
 space.setConfig(Newton.SimConfig.RANDOM_POSITION_AND_ROTATION)     # Set Stars Behavior
 
-space.populate(500)                                 # populate space with n=200 stars
+space.populate(400)                                 # populate space with n=200 stars
 
 renderer = Newton.Renderer(
-    "render_500s_0-5dt_400f_750x1000_v1",           # file name
+    "render_400s_1dt_400f_1000x750_v1",             # file name
     1                                               # Adjusting rendered image scale
 )
 
 sim = Newton.Simulation(
-    0.5,                                            # time step
+    1,                                              # time step
     400,                                            # numbers of frame (at 30 fps)
     space,                                          # space to compute reference
     renderer,                                       # renderer reference

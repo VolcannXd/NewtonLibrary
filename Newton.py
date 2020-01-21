@@ -246,7 +246,6 @@ class Simulation:
         self.frames = frames
         self.space = space
         self.renderer = renderer
-
         space.deltaTime = self.deltaTime
 
     def simulate(self) :
