@@ -29,7 +29,9 @@ Follow the instructions on the [official website](https://pillow.readthedocs.io/
 Copy and paste or download `Newton.py` on your computer and save it in a folder.
 Open any IDE or text editor that you know capable of saving (and maybe execute) python 3.8.x and create a new file `[name].py` that you will save in the same folder as `Newton.py`. Then, import newton library as so : `import Newton`.
 
-#### d. Setup `space` object
+### 2. Configure `Newton.Space` object
+
+#### a. Setup `space` object
 You will need to create a `space` object to perform calculations. `Newton.Space` is a dual argument object that will store basic informations about your space (the actual object that your stars live in).
 
 ##### Two arguments :
@@ -44,7 +46,7 @@ space = Newton.Space(
 )
 ```
 
-#### e. Populate your space with stars
+#### b. Populate your space with stars
 `Newton.Space.populate(n)` is a mono argument function part of the `Newton.Space` object.
 
 ##### One argument :
