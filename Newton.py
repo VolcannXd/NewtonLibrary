@@ -27,17 +27,29 @@ from datetime import date, datetime     # DateTime: date & dateTime
 import time
 import os                               # OS: import for directory managment
 
+
+# ###############################
+# UNIVERS CONFIGURATION OBJECT
+# ###############################
+class SimConfig:
+    RANDOM_POSITION_AND_ROTATION = 0
+    ROTATE_AROUND = 1
+
 # ###############################
 # STAR OBJECT
 # ###############################
 class Star:
-    def __init__(self, position, minMass, MaxMass) :
+    def __init__(self, position, minMass, MaxMass, behavior) :
         self.position = position
         self.minMass = minMass
         self.MaxMass = MaxMass
         self.mass = random.randint(minMass, MaxMass)
 
-        self.speed = 0
+        self.pastPosition = Vec2
+
+        self.speed = Vec2(0, 0)
+
+        self.speed = self.initStarBehavior(behavior)
 
         self.color = (
             255,
@@ -45,13 +57,18 @@ class Star:
             random.randint(0, 10)
         )
 
+    def initStarBehavior(self, behavior) :
+        if behavior == SimConfig.ROTATE_AROUND   : return Vec2.computeDirectionToPointAfromB(self.position, Vec2(500, 500)).rotateVector2d(0.5 * math.pi).MultiplyDouble(0.2)
+        else : return Vec2(random.random(), random.random())
+
+
     def draw(self, g, scale) :
         # Draw a white point on g at (self.x * scale, self.y * scale)
         # scale (float) represent grid scale
         px = self.position.x * scale
         py = self.position.y * scale
 
-        shapeScale = self.minMass * 5
+        shapeScale = self.minMass * 7
 
         # define shape
         shape = [
@@ -91,12 +108,14 @@ class Star:
                     self.computeDirection(star).MultiplyDouble(force)
                 )
 
-        acc =  Forces.MultiplyDouble(1/self.mass)
+        acc =  Forces.DivideConstBySelf(self.mass)
 
         return acc
 
     def move(self, space) :
-        self.position.AddVec2d(self.computeAcceleration(space))
+        self.speed.AddVec2d(self.computeAcceleration(space)).MultiplyDouble(space.deltaTime)
+
+        self.position.AddVec2d(self.speed)
 
 # ###############################
 # VECTOR 2D OBJECT
@@ -113,6 +132,12 @@ class Vec2:
 
     def logVector2d(self) :
         return "(" + str(self.x) + ", " + str(self.y) + ")"
+
+    def computeDirectionToPointAfromB(A, B) :
+        return Vec2(
+            A.x - B.x,
+            A.y - B.y
+        )
 
     def AddVec2d(self, vec) :
         self.x += vec.x
@@ -135,6 +160,17 @@ class Vec2:
         self.y *= double
         return self
 
+    def DivideConstBySelf(self, const) :
+        const / self.x
+        const / self.y
+        return self
+
+    def rotateVector2d(self, alpha) :
+        return Vec2(
+            math.cos(alpha) * self.x - math.sin(alpha) * self.y,
+            math.cos(alpha) * self.x + math.sin(alpha) * self.y
+        )
+
 class Space:
     # Space Class
     def __init__(self, size, gravity) :
@@ -142,6 +178,10 @@ class Space:
         self.gravity = gravity
         self.stars = []
         self.deltaTime = 0
+        self.config = SimConfig.RANDOM_POSITION_AND_ROTATION
+
+    def setConfig(self, config) :
+        self.config = config
 
     def populate(self, n) :
         for i in range(0, n) :
@@ -152,8 +192,9 @@ class Space:
 
             star = Star(
                 Vec2(x, y),     # Postion
-                1000,           # Minimal position
-                10000           # Maximal position
+                10000,          # Minimal position
+                100000,         # Maximal position
+                self.config
             )
 
             self.stars.append(star)
@@ -211,12 +252,13 @@ class Simulation:
 
     def simulate(self) :
         start_time = time.time()
-        print("LOG: Start simulation caching...")
         print("#######################################")
+        print("FILE : " + self.renderer.filename + ".gif")
+        print("#######################################")
+        print("LOG: Start simulation caching...")
         for f in range(0, self.frames) :
-            for dt in range(0, self.deltaTime) :
-                self.space.update()
-
+            sim = self
+            self.space.update()
             self.renderer.computeCache(self.space)
 
             frameCount = "[" + str(f + 1) + "/" + str(self.frames) + "]"
