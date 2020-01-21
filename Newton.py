@@ -28,6 +28,29 @@ import time
 import os                               # OS: import for directory managment
 
 # ###############################
+# CLUSTER OBJECT
+# ###############################
+class Cluster :
+    def __init__ (self, stars) :
+        self.defaultSet = stars
+        self.stars = []
+        self.stars.append(stars)
+        
+    def getPositions(self, t) :
+        return stars[t]
+    
+    def setPositions(self, t, stars) :
+        if t < len(stars) :
+            self.stars[t] = stars
+        else :
+            self.stars.append(stars)
+            
+        return t
+    
+    def LogInfos(self) :
+        return len(self.stars)
+
+# ###############################
 # STAR OBJECT
 # ###############################
 class Star:
