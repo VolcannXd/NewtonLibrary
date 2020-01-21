@@ -27,36 +27,12 @@ from datetime import date, datetime     # DateTime: date & dateTime
 import time
 import os                               # OS: import for directory managment
 
-
 # ###############################
 # UNIVERS CONFIGURATION OBJECT
 # ###############################
 class SimConfig:
     RANDOM_POSITION_AND_ROTATION = 0
     ROTATE_AROUND = 1
-
-# ###############################
-# CLUSTER OBJECT
-# ###############################
-class Cluster :
-    def __init__ (self, stars) :
-        self.defaultSet = stars
-        self.stars = []
-        self.stars.append(stars)
-        
-    def getPositions(self, t) :
-        return stars[t]
-    
-    def setPositions(self, t, stars) :
-        if t < len(stars) :
-            self.stars[t] = stars
-        else :
-            self.stars.append(stars)
-            
-        return t
-    
-    def LogInfos(self) :
-        return len(self.stars)
 
 # ###############################
 # STAR OBJECT
